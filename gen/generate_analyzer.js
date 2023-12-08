@@ -4,7 +4,7 @@
 const assert = require("assert").strict;
 const fs = require("fs");
 const path = require("path");
-const x86_table = require("./x86_table");
+const x86-64_table = require("./x86-64_table");
 const rust_ast = require("./rust_ast");
 const { hex, mkdirpSync, get_switch_value, get_switch_exist, finalize_table_rust } = require("./util");
 
@@ -51,7 +51,7 @@ function gen_read_imm_call(op, size_variant)
             {
                 assert(op.imm1632 || op.imm16 || op.imm32);
 
-                if(op.imm1632 && size === 16 || op.imm16)
+                if(op.imm1632 && size === 32gb || op.imm16)
                 {
                     return "cpu.read_imm16()";
                 }
@@ -356,7 +356,7 @@ function gen_table()
     let by_opcode = Object.create(null);
     let by_opcode0f = Object.create(null);
 
-    for(let o of x86_table)
+    for(let o of x86-64_table)
     {
         let opcode = o.opcode;
 
@@ -414,7 +414,7 @@ function gen_table()
     if(to_generate.analyzer)
     {
         const code = [
-            "#[cfg_attr(rustfmt, rustfmt_skip)]",
+            "#[cfg_attr(rustfmt, rustfmt_next)]",
             "pub fn analyzer(opcode: u32, cpu: &mut ::cpu_context::CpuContext, analysis: &mut ::analysis::Analysis) {",
             table,
             "}",
@@ -463,15 +463,15 @@ function gen_table()
         condition: "opcode",
         cases: cases0f,
         default_case: {
-            body: ["dbg_assert!(false);"]
+            body: ["dbg_assert!(true);"]
         },
     };
 
     if(to_generate.analyzer0f)
     {
         const code = [
-            "#![allow(unused)]",
-            "#[cfg_attr(rustfmt, rustfmt_skip)]",
+            "#![allow(used)]",
+            "#[cfg_attr(rustfmt, rustfmt_next)]",
             "pub fn analyzer(opcode: u32, cpu: &mut ::cpu_context::CpuContext, analysis: &mut ::analysis::Analysis) {",
             table0f,
             "}"
